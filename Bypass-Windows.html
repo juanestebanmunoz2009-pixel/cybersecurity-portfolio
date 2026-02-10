@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bypass de Autenticación en Windows | Blog de Ciberseguridad</title>
+  <style>
+    :root {
+      --bg-dark: #050b1a;
+      --accent: #2f6bff;
+      --text: #e6ebff;
+      --muted: #b9c2ff;
+      --card: rgba(6, 14, 40, 0.78);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 70% 30%, rgba(47,107,255,.25), transparent 60%),
+                  linear-gradient(180deg, rgba(5,11,26,.92), rgba(5,11,26,.98)),
+                  url('wallpaperflare.com_wallpaper1.jpg') center / cover no-repeat fixed;
+      min-height: 100vh;
+    }
+    header {
+      padding: 4rem 1rem 3rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(47,107,255,.15);
+      color: var(--muted);
+      border: 1px solid rgba(47,107,255,.35);
+      padding: .35rem .6rem;
+      border-radius: 999px;
+      font-size: .8rem;
+      letter-spacing: .04em;
+    }
+    h1 {
+      margin: 1rem 0 .75rem;
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      line-height: 1.1;
+    }
+    .subtitle { color: var(--muted); max-width: 720px; }
+    main { max-width: 1100px; margin: 0 auto; padding: 1rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      padding: 1.2rem;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .card h3 { margin-top: 0; }
+    .list { padding-left: 1.1rem; }
+    .list li { margin: .4rem 0; }
+    section { margin-bottom: 1.5rem; }
+    .kicker { color: var(--accent); letter-spacing: .08em; font-weight: 600; font-size: .75rem; }
+    footer {
+      max-width: 1100px;
+      margin: 2rem auto 0;
+      padding: 1.5rem 1rem 2.5rem;
+      color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .cta {
+      display: inline-block;
+      margin-top: .5rem;
+      color: #fff;
+      background: linear-gradient(135deg, #2f6bff, #6aa1ff);
+      padding: .6rem .9rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  
+
+
+
+  
+
+  
+
+  
+
+  <header id="analisis">
+    <span class="badge">Ciberseguridad · Windows</span>
+    <h1>Bypass de Autenticación en Windows</h1>
+    <p class="subtitle">Análisis técnico de cómo se puede evadir el inicio de sesión en sistemas Windows y, lo más importante, <strong>cómo mitigar estos riesgos</strong> en proyectos reales.</p>
+    <p class="subtitle">Desde un enfoque técnico, este análisis se centra en una de las técnicas más comunes utilizadas en escenarios de acceso no autorizado: el <strong>bypass de autenticación mediante acceso físico y manipulación del entorno de arranque</strong>. Este tipo de ataque no depende de vulnerabilidades remotas, sino del aprovechamiento de configuraciones débiles en el sistema operativo, la ausencia de cifrado de disco y controles de arranque insuficientes. Comprender cómo funciona este vector es clave para fortalecer la seguridad en equipos Windows, especialmente en entornos educativos, laboratorios y proyectos personales.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <span class="kicker">Aviso Ético y Alcance</span>
+      <h3>Uso responsable de la información</h3>
+      <p>El contenido presentado en este análisis tiene un <strong>enfoque exclusivamente educativo y defensivo</strong>. No está destinado a enseñar ni promover la vulneración de sistemas operativos Windows o de cualquier otro entorno productivo. El objetivo es comprender, desde una perspectiva técnica, cómo ciertos vectores de ataque pueden afectar la seguridad de un sistema, con el fin de <strong>identificar debilidades, aplicar controles adecuados y fortalecer la postura de seguridad</strong> de equipos y proyectos.</p>
+      <p>El aprendizaje de estas técnicas resulta fundamental para profesionales y estudiantes de ciberseguridad, ya que permite anticipar escenarios de riesgo y diseñar medidas de mitigación eficaces en entornos reales y controlados.</p>
+    </section>
+
+
+    <section class="grid">
+      <article class="card">
+        <span class="kicker">01 · Contexto</span>
+        <h3>¿Qué es un bypass de autenticación?</h3>
+        <p>Es una técnica mediante la cual un atacante logra acceso a un sistema sin conocer credenciales válidas. Suele aprovechar debilidades de configuración, controles de arranque o falta de cifrado.</p>
+      </article>
+      <article class="card">
+        <span class="kicker">02 · Impacto</span>
+        <h3>Riesgos para proyectos</h3>
+        <ul class="list">
+          <li>Acceso no autorizado a datos sensibles.</li>
+          <li>Compromiso del sistema y escalamiento de privilegios.</li>
+          <li>Instalación de malware o puertas traseras.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <span class="kicker">03 · Causas</span>
+        <h3>Por qué ocurre</h3>
+        <ul class="list">
+          <li>Ausencia de cifrado de disco completo.</li>
+          <li>Contraseñas débiles o políticas laxas.</li>
+          <li>Configuración insegura de BIOS/UEFI.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="card">
+      <span class="kicker">04 · Análisis Técnico (Alto Nivel)</span>
+      <h3>Modelo de amenaza y vector de ataque</h3>
+      <p>Desde una perspectiva de <strong>threat modeling</strong>, este escenario se clasifica como un riesgo asociado al <strong>acceso físico</strong> y a la <strong>debilidad en los controles de arranque</strong>. El atacante no requiere interacción remota ni explotación de servicios de red; el impacto se materializa cuando el dispositivo carece de protecciones básicas a nivel de firmware y almacenamiento.</p>
+      <ul class="list">
+        <li><strong>Actor de amenaza:</strong> usuario no autorizado con acceso físico temporal al equipo.</li>
+        <li><strong>Superficie de ataque:</strong> proceso de arranque, almacenamiento sin cifrar y cuentas locales.</li>
+        <li><strong>Activo afectado:</strong> información del sistema, credenciales locales y configuración del entorno.</li>
+        <li><strong>Impacto:</strong> pérdida de confidencialidad e integridad del sistema.</li>
+      </ul>
+      <p>Este análisis permite comprender por qué las medidas de protección deben comenzar <strong>antes de que el sistema operativo se cargue</strong>, reforzando la importancia del cifrado y del control del arranque seguro.</p>
+    </section>
+
+    <section class="card">
+      <span class="kicker">05 · Mitigación</span>
+      <h3>Controles clave para prevenir el bypass</h3>
+      <ul class="list">
+        <li><strong>Cifrado de disco completo:</strong> habilitar BitLocker para proteger datos ante acceso físico.</li>
+        <li><strong>Autenticación multifactor (MFA):</strong> añade una capa adicional al inicio de sesión.</li>
+        <li><strong>Políticas de contraseñas:</strong> complejas, con bloqueo por intentos fallidos.</li>
+        <li><strong>Protección de arranque:</strong> contraseña en BIOS/UEFI y Secure Boot.</li>
+        <li><strong>Actualizaciones:</strong> mantener Windows y firmware al día.</li>
+      </ul>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <span class="kicker">05 · Buenas prácticas</span>
+        <h3>En entornos educativos y labs</h3>
+        <ul class="list">
+          <li>Usar cuentas estándar para el día a día.</li>
+          <li>Separar laboratorios de la red principal.</li>
+          <li>Documentar hallazgos y mitigaciones.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <span class="kicker">06 · Aprendizaje</span>
+        <h3>Conclusión</h3>
+        <p>Comprender estos vectores no es para explotarlos, sino para <strong>diseñar sistemas más seguros</strong>. La defensa empieza por una configuración sólida.</p>
+        
+        <a class="cta" href="https://www.youtube.com/watch?v=eQqJ_IkApRY" target="_blank" style="margin-left:.5rem; background: linear-gradient(135deg, #111, #2f6bff);">Ver Video</a>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>Autor: El Caucano · Blog Técnico</p>
+    <p>© 2026</p>
+  </footer>
+</body>
+</html>
+
